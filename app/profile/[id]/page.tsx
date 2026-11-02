@@ -74,6 +74,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .eq('follower_id', profileId)
 
   let isFollowing = false
+  let isBlocked = false
   if (currentUser && currentUser.id !== profileId) {
     const { data: followRecord } = await supabase
       .from('follows')
@@ -82,6 +83,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       .eq('following_id', profileId)
       .maybeSingle()
     isFollowing = !!followRecord
+
+    const { data: blockRecord } = await supabase
+      .from('blocks')
+      .select('blocker_id')
+      .eq('blocker_id', currentUser.id)
+      .eq('blocked_id', profileId)
+      .maybeSingle()
+    isBlocked = !!blockRecord
   }
 
   const isOwnProfile = currentUser?.id === profileId
@@ -119,6 +128,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   targetUserName={profile.name}
                   initialIsFollowing={isFollowing}
                   initialFollowersCount={followersCount || 0}
+                  initialIsBlocked={isBlocked}
                   skills={teachSkills.map((s) => ({
                     id: s.skills?.id || s.id,
                     name: s.skills?.name || 'Skill',

@@ -51,6 +51,19 @@ export function RequestSessionModal({
         return
       }
 
+      // Check if blocked in either direction
+      const { data: isBlocked } = await supabase
+        .from('blocks')
+        .select('blocker_id')
+        .or(`and(blocker_id.eq.${user.id},blocked_id.eq.${targetUserId}),and(blocker_id.eq.${targetUserId},blocked_id.eq.${user.id})`)
+        .maybeSingle()
+
+      if (isBlocked) {
+        setError('You cannot send a session request to this user.')
+        setLoading(false)
+        return
+      }
+
       const { error: insertError } = await supabase.from('session_requests').insert({
         from_id: user.id,
         to_id: targetUserId,

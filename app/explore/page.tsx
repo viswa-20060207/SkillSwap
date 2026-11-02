@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { FollowButton } from '@/components/profile/FollowButton'
 import { SkillLevel } from '@/lib/database.types'
+import { Skeleton } from '@/components/ui/Skeleton'
 import {
   Search,
   Filter,
@@ -68,14 +69,20 @@ export default function ExplorePage() {
       let followingIds: Set<string> = new Set()
 
       if (userId) {
-        const { data: blocks } = await supabase
+        const { data: myBlocks } = await supabase
           .from('blocks')
           .select('blocked_id')
           .eq('blocker_id', userId)
 
-        if (blocks) {
-          blockedIds = blocks.map((b) => b.blocked_id)
-        }
+        const { data: blockedMe } = await supabase
+          .from('blocks')
+          .select('blocker_id')
+          .eq('blocked_id', userId)
+
+        const blockedSet = new Set<string>()
+        myBlocks?.forEach((b) => blockedSet.add(b.blocked_id))
+        blockedMe?.forEach((b) => blockedSet.add(b.blocker_id))
+        blockedIds = Array.from(blockedSet)
 
         const { data: follows } = await supabase
           .from('follows')
@@ -236,8 +243,23 @@ export default function ExplorePage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+                <div className="flex items-start gap-3.5">
+                  <Skeleton className="w-12 h-12 rounded-full shrink-0" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+                <Skeleton className="h-8 w-full" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : profiles.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-lg mx-auto shadow-xs space-y-3">

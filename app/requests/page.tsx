@@ -7,6 +7,8 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { SessionStatus } from '@/lib/database.types'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { useToast } from '@/components/ui/Toast'
 import {
   Inbox,
   Send,
@@ -36,6 +38,7 @@ export default function RequestsPage() {
   const [outgoing, setOutgoing] = useState<SessionRequestItem[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const { success, error: toastError } = useToast()
 
   const fetchRequests = async () => {
     setLoading(true)
@@ -95,12 +98,15 @@ export default function RequestsPage() {
 
       if (error) throw error
 
+      success(newStatus === 'accepted' ? 'Session request accepted!' : 'Session request declined.')
+
       // Update state locally
       setIncoming((prev) =>
         prev.map((r) => (r.id === requestId ? { ...r, status: newStatus } : r))
       )
     } catch (err) {
-      console.error(err)
+      const msg = err instanceof Error ? err.message : 'Failed to update request'
+      toastError(msg)
     } finally {
       setActionLoading(null)
     }
@@ -157,8 +163,19 @@ export default function RequestsPage() {
       {/* Requests List */}
       <div>
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1">
+                  <Skeleton className="w-12 h-12 rounded-full shrink-0" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
+                </div>
+                <Skeleton className="h-9 w-24 rounded-lg" />
+              </div>
+            ))}
           </div>
         ) : activeList.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto shadow-xs space-y-3">

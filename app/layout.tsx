@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
+import { ToastProvider } from '@/components/ui/Toast'
 
 export const metadata: Metadata = {
   title: 'SkillSwap - Peer-to-Peer Learning Platform',
@@ -40,12 +41,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased">
-        <Navbar
-          currentUserId={user?.id}
-          userName={profile?.name || user?.email?.split('@')[0] || 'Member'}
-          userAvatar={profile?.avatar_url || ''}
-        />
-        <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">{children}</main>
+        <ToastProvider>
+          <Navbar
+            currentUserId={user?.id}
+            userName={profile?.name || user?.email?.split('@')[0] || 'Member'}
+            userAvatar={profile?.avatar_url || ''}
+          />
+          <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">{children}</main>
+        </ToastProvider>
       </body>
     </html>
   )
