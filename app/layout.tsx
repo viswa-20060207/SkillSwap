@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -7,8 +7,14 @@ export const metadata: Metadata = {
   title: 'SkillSwap - Peer-to-Peer Learning Platform',
   description: 'Trade skills, learn from peers, and collaborate in 1-on-1 real-time sessions.',
   manifest: '/manifest.json',
+}
+
+export const viewport: Viewport = {
   themeColor: '#2563eb',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default async function RootLayout({
