@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { SkillQuizModal } from '@/components/profile/SkillQuizModal'
 import { SkillLevel, SkillRole } from '@/lib/database.types'
 import {
   Camera,
@@ -19,6 +20,7 @@ import {
   Sparkles,
   BookOpen,
   ArrowRight,
+  ShieldCheck,
 } from 'lucide-react'
 
 interface UserSkillItem {
@@ -27,6 +29,7 @@ interface UserSkillItem {
   name: string
   role: SkillRole
   level: SkillLevel
+  is_verified?: boolean
 }
 
 interface AvailableSkill {
@@ -61,8 +64,9 @@ export default function ProfileEditPage() {
   const [learnSkillName, setLearnSkillName] = useState('')
   const [learnLevel, setLearnLevel] = useState<SkillLevel>('beginner')
 
-  // Feedback messages
+  // Feedback messages & Quiz modal
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [quizSkill, setQuizSkill] = useState<UserSkillItem | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -104,18 +108,30 @@ export default function ProfileEditPage() {
         setAvailableSkills(skillsData)
       }
 
-      // Fetch user's existing skills
-      const { data: userSkillsData } = await supabase
-        .from('user_skills')
-        .select('id, skill_id, role, level, skills(id, name)')
-        .eq('user_id', user.id)
-
+      // Fetch user's existing skills (with graceful fallback if is_verified migration isn't applied yet)
       interface UserSkillQueryItem {
         id: string
         skill_id: string
         role: SkillRole
         level: SkillLevel
+        is_verified?: boolean
         skills: { id: string; name: string } | null
+      }
+
+      let userSkillsData: unknown[] | null = null
+      const { data: withVer, error: verErr } = await supabase
+        .from('user_skills')
+        .select('id, skill_id, role, level, is_verified, skills(id, name)')
+        .eq('user_id', user.id)
+
+      if (!verErr && withVer) {
+        userSkillsData = withVer
+      } else {
+        const { data: baseSkills } = await supabase
+          .from('user_skills')
+          .select('id, skill_id, role, level, skills(id, name)')
+          .eq('user_id', user.id)
+        userSkillsData = baseSkills
       }
 
       if (userSkillsData) {
@@ -126,6 +142,7 @@ export default function ProfileEditPage() {
           name: item.skills?.name || 'Unknown',
           role: item.role,
           level: item.level,
+          is_verified: !!item.is_verified,
         }))
         setUserSkills(formatted)
       }
@@ -492,6 +509,23 @@ export default function ProfileEditPage() {
                 <Badge variant="blue" size="sm">
                   {item.level}
                 </Badge>
+                {item.is_verified ? (
+                  <span
+                    className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md"
+                    title="Verified via SkillSwap Quiz"
+                  >
+                    <ShieldCheck className="w-3 h-3" /> Verified
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setQuizSkill(item)}
+                    className="text-[11px] font-semibold text-blue-700 bg-white border border-blue-200 hover:bg-blue-100 px-2 py-0.5 rounded-md transition-colors"
+                    title="Take a 3-question quiz to verify this skill"
+                  >
+                    Verify (Quiz)
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => handleRemoveSkill(item.id)}
@@ -622,6 +656,20 @@ export default function ProfileEditPage() {
           </Button>
         </div>
       </div>
+
+      {quizSkill && (
+        <SkillQuizModal
+          isOpen={!!quizSkill}
+          onClose={() => setQuizSkill(null)}
+          userSkillId={quizSkill.id}
+          skillName={quizSkill.name}
+          onVerified={(verifiedId) => {
+            setUserSkills((prev) =>
+              prev.map((s) => (s.id === verifiedId ? { ...s, is_verified: true } : s))
+            )
+          }}
+        />
+      )}
     </div>
   )
 }

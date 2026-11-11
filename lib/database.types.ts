@@ -80,6 +80,7 @@ export interface Database {
           skill_id: string
           role: SkillRole
           level: SkillLevel
+          is_verified: boolean
           created_at: string
         }
         Insert: {
@@ -88,6 +89,7 @@ export interface Database {
           skill_id: string
           role: SkillRole
           level: SkillLevel
+          is_verified?: boolean
           created_at?: string
         }
         Update: {
@@ -96,6 +98,7 @@ export interface Database {
           skill_id?: string
           role?: SkillRole
           level?: SkillLevel
+          is_verified?: boolean
           created_at?: string
         }
         Relationships: [
@@ -152,6 +155,7 @@ export interface Database {
           skill_id: string | null
           message: string
           status: SessionStatus
+          completed_at: string | null
           created_at: string
           updated_at: string
         }
@@ -162,6 +166,7 @@ export interface Database {
           skill_id?: string | null
           message?: string
           status?: SessionStatus
+          completed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -172,6 +177,7 @@ export interface Database {
           skill_id?: string | null
           message?: string
           status?: SessionStatus
+          completed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -345,6 +351,55 @@ export interface Database {
           {
             foreignKeyName: "blocks_blocked_id_fkey"
             columns: ["blocked_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      session_reviews: {
+        Row: {
+          id: string
+          session_id: string
+          reviewer_id: string
+          reviewee_id: string
+          rating: number
+          comment: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          reviewer_id: string
+          reviewee_id: string
+          rating: number
+          comment?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          reviewer_id?: string
+          reviewee_id?: string
+          rating?: number
+          comment?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_reviews_session_id_fkey"
+            columns: ["session_id"]
+            referencedRelation: "session_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_reviews_reviewee_id_fkey"
+            columns: ["reviewee_id"]
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           }

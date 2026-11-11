@@ -72,7 +72,11 @@ DAILY_API_KEY=<your-daily-api-key>
 ```
 
 ### 3. Database Migration
-Apply the database schema and RLS policies located in [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) inside your Supabase project's **SQL Editor**.
+Apply the database schemas and RLS policies located in:
+1. [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql)
+2. [`supabase/migrations/002_enhancements.sql`](supabase/migrations/002_enhancements.sql) (Skill verification, session completion & reviews)
+
+inside your Supabase project's **SQL Editor**.
 
 Ensure the following buckets are created in **Supabase Storage**:
 - `avatars` (Public bucket)
@@ -103,6 +107,7 @@ When importing your repository into Vercel, add the following variables under **
 | `NEXT_PUBLIC_SUPABASE_URL` | **Yes** | Your Supabase Project URL (`https://<project-ref>.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | **Yes** | Your Supabase public anonymous API key |
 | `DAILY_API_KEY` | Optional | Your Daily.co REST API key for live voice calls |
+| `GEMINI_API_KEY` | Optional | Your Google Gemini API key for live AI Study Helper responses |
 
 ---
 

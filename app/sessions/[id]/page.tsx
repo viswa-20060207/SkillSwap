@@ -5,9 +5,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { RealtimeChat } from '@/components/session/RealtimeChat'
-import { NotesPanel } from '@/components/session/NotesPanel'
 import { VoiceCallPanel } from '@/components/session/VoiceCallPanel'
+import { SessionWorkspace } from '@/components/session/SessionWorkspace'
+import { CompleteSessionAction } from '@/components/session/CompleteSessionModal'
 import {
   ArrowLeft,
   ShieldCheck,
@@ -64,11 +64,34 @@ export default async function SessionRoomPage({ params }: SessionRoomPageProps) 
     redirect('/requests?error=session_not_accepted')
   }
 
+  // Safely check optional 002_enhancements fields (completed_at and session_reviews)
+  let isCompleted = false
+  let hasReviewed = false
+  try {
+    const { data: compData } = await supabase
+      .from('session_requests')
+      .select('completed_at')
+      .eq('id', sessionId)
+      .single()
+    isCompleted = !!compData?.completed_at
+
+    const { data: reviewData } = await supabase
+      .from('session_reviews')
+      .select('id')
+      .eq('session_id', sessionId)
+      .eq('reviewer_id', user.id)
+      .maybeSingle()
+    hasReviewed = !!reviewData
+  } catch {
+    // Graceful fallback if 002_enhancements.sql hasn't been applied yet
+  }
+
   const fromProfile = session.fromProfile as unknown as SessionProfile | null
   const toProfile = session.toProfile as unknown as SessionProfile | null
   const otherUser = session.from_id === user.id ? toProfile : fromProfile
   const myProfile = session.from_id === user.id ? fromProfile : toProfile
   const otherRole = session.from_id === user.id ? 'Mentor / Teacher' : 'Learner'
+  const topicName = session.skills?.name || 'SkillSwap Session'
 
   return (
     <div className="space-y-6 pb-16">
@@ -84,13 +107,13 @@ export default async function SessionRoomPage({ params }: SessionRoomPageProps) 
           <Avatar src={otherUser?.avatar_url} name={otherUser?.name || 'Peer'} size="lg" />
 
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-lg sm:text-xl font-bold text-slate-900">{otherUser?.name}</h1>
               <Badge variant="green" size="sm">
                 <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Private Session
               </Badge>
             </div>
-            <p className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+            <p className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-0.5">
               <span>{otherRole}</span>
               {otherUser?.college && <span>• {otherUser.college}</span>}
               {session.skills?.name && (
@@ -100,29 +123,31 @@ export default async function SessionRoomPage({ params }: SessionRoomPageProps) 
           </div>
         </div>
 
-        {/* Voice Call Controls (P8) */}
-        <div>
+        {/* Action Controls: Complete & Rate + Voice Call (P8/P9+) */}
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+          {otherUser?.id && (
+            <CompleteSessionAction
+              sessionId={sessionId}
+              currentUserId={user.id}
+              otherUserId={otherUser.id}
+              otherUserName={otherUser.name || 'Peer'}
+              skillName={topicName}
+              initialCompleted={isCompleted}
+              initialHasReviewed={hasReviewed}
+            />
+          )}
           <VoiceCallPanel sessionId={sessionId} />
         </div>
       </div>
 
-      {/* Main Workspace: Realtime Chat (P6) & Notes Sharing (P7) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        {/* Left Column: Realtime Chat (P6) */}
-        <RealtimeChat
-          sessionId={sessionId}
-          currentUserId={user.id}
-          currentUserName={myProfile?.name || user.email?.split('@')[0] || 'User'}
-          currentUserAvatar={myProfile?.avatar_url || ''}
-        />
-
-        {/* Right Column: Shared Notes & Code Snippets (P7) */}
-        <NotesPanel
-          sessionId={sessionId}
-          currentUserId={user.id}
-          currentUserName={myProfile?.name || user.email?.split('@')[0] || 'User'}
-        />
-      </div>
+      {/* Main Tabbed Workspace: Chat, Notes & Code, Live Whiteboard, AI Helper */}
+      <SessionWorkspace
+        sessionId={sessionId}
+        currentUserId={user.id}
+        currentUserName={myProfile?.name || user.email?.split('@')[0] || 'User'}
+        currentUserAvatar={myProfile?.avatar_url || ''}
+        topic={topicName}
+      />
     </div>
   )
 }
