@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { Compass, Users, User, LogOut, Menu, X, Inbox } from 'lucide-react'
 
 interface NavbarProps {
@@ -41,13 +42,14 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
       <header className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
               S
             </div>
             <span className="font-bold text-xl text-slate-900 tracking-tight">
               Skill<span className="text-blue-600">Swap</span>
             </span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
     )
@@ -59,7 +61,7 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
         {/* Logo */}
         <div className="flex items-center gap-8">
           <Link href="/explore" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
               S
             </div>
             <span className="font-bold text-xl text-slate-900 tracking-tight">
@@ -90,8 +92,10 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
           </nav>
         </div>
 
-        {/* User profile & Logout */}
+        {/* User profile, Theme Toggle & Logout */}
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
+
           {currentUserId && (
             <Link
               href={`/profile/${currentUserId}`}
@@ -120,6 +124,7 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
 
         {/* Mobile menu button */}
         <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
           {currentUserId && (
             <Link href={`/profile/${currentUserId}`}>
               <Avatar src={userAvatar} name={userName} size="sm" />

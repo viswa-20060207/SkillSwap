@@ -4,8 +4,8 @@
   "description": "Peer-to-peer 1-on-1 skill exchange and learning platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "background_color": "#f8fafc",
+  "theme_color": "#7c3aed",
   "icons": [
     {
       "src": "/icon.png",

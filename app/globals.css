@@ -3,21 +3,150 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark {
+  --background: #090d16;
+  --foreground: #f8fafc;
+  color-scheme: dark;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Midnight Dark Theme (#3) Global Surface & Contrast Rules */
+html.dark body,
+html.dark .bg-slate-50 {
+  background-color: #090d16 !important;
+  color: #f8fafc;
+}
+
+html.dark .bg-white {
+  background-color: #111827 !important;
+  color: #f8fafc;
+}
+
+/* Keep the collaborative whiteboard drawing canvas always crisp white */
+html.dark canvas.bg-white {
+  background-color: #ffffff !important;
+}
+
+html.dark .bg-slate-100,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/50,
+html.dark .bg-slate-50\/40,
+html.dark .bg-slate-100\/60 {
+  background-color: #1e293b !important;
+}
+
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover {
+  background-color: #1f2937 !important;
+}
+
+html.dark .border-slate-200,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-300,
+html.dark .border-slate-100 {
+  border-color: #1f2937 !important;
+}
+
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark input:not([type="radio"]):not([type="checkbox"]),
+html.dark select,
+html.dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Glowing Accent Pills in Midnight Dark Mode */
+html.dark .bg-blue-50,
+html.dark .bg-blue-50\/80,
+html.dark .bg-blue-100 {
+  background-color: rgba(124, 58, 237, 0.22) !important;
+}
+
+html.dark .text-blue-600,
+html.dark .text-blue-700,
+html.dark .text-blue-900 {
+  color: #c4b5fd !important;
+}
+
+html.dark .border-blue-200 {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+html.dark .bg-purple-50 {
+  background-color: rgba(147, 51, 234, 0.22) !important;
+}
+
+html.dark .text-purple-600,
+html.dark .text-purple-700 {
+  color: #d8b4fe !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+html.dark .text-emerald-700,
+html.dark .text-emerald-800 {
+  color: #6ee7b7 !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/70 {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+html.dark .text-amber-700,
+html.dark .text-amber-800 {
+  color: #fcd34d !important;
+}
+
+html.dark .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.2) !important;
+}
+
+html.dark .text-orange-700,
+html.dark .text-orange-800 {
+  color: #fdba74 !important;
+}
+
+html.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+html.dark .text-red-600,
+html.dark .text-red-700 {
+  color: #fca5a5 !important;
 }
 
 @layer utilities {
