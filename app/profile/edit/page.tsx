@@ -431,13 +431,50 @@ export default function ProfileEditPage() {
           <div className="text-center sm:text-left">
             <h3 className="font-semibold text-slate-800">Profile Photo</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              JPG, PNG or GIF. Uploaded directly to your secure avatars bucket.
+              Click the camera icon to upload your own photo, or pick one from below.
             </p>
             {uploadingAvatar && (
               <p className="text-xs text-blue-600 font-medium mt-1 flex items-center gap-1">
                 <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></span> Uploading...
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Preset Avatars Selection */}
+        <div className="pt-2 border-t border-slate-100">
+          <p className="text-xs font-semibold text-slate-700 mb-2">Or pick a quick avatar:</p>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {[
+              { label: 'Avatar 1', url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Avatar 2', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Avatar 3', url: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Avatar 4', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Avatar 5', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Avatar 6', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80' },
+              { label: 'Bot Coder', url: 'https://api.dicebear.com/7.x/bottts/svg?seed=SkillSwap' },
+              { label: 'Tech Pro', url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nesi' },
+            ].map((p) => (
+              <button
+                key={p.url}
+                type="button"
+                onClick={async () => {
+                  setAvatarUrl(p.url)
+                  if (userId) {
+                    const supabase = createClient()
+                    await supabase.from('profiles').update({ avatar_url: p.url }).eq('id', userId)
+                    setMessage({ type: 'success', text: 'Profile picture updated successfully!' })
+                  }
+                }}
+                className={`w-11 h-11 rounded-full overflow-hidden border-2 transition-all hover:scale-110 focus:outline-none ${
+                  avatarUrl === p.url ? 'border-blue-600 ring-2 ring-blue-500/30' : 'border-slate-200 hover:border-blue-400'
+                }`}
+                title={`Select ${p.label}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.url} alt={p.label} className="w-full h-full object-cover" />
+              </button>
+            ))}
           </div>
         </div>
 
