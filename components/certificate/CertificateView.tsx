@@ -124,10 +124,10 @@ export function CertificateView({
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold text-2xl shadow-md mb-2">
-              S
+              TS
             </div>
             <div className="flex items-center justify-center gap-1.5 text-amber-600 font-semibold tracking-widest text-xs uppercase">
-              <Sparkles className="w-3.5 h-3.5" /> SkillSwap Verified Peer Learning Network <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5" /> A Smart Platform for Talent Sharing &amp; Mutual Learning <Sparkles className="w-3.5 h-3.5" />
             </div>
             <h1 className="text-2xl sm:text-4xl font-serif font-extrabold text-slate-900 tracking-tight uppercase">
               Certificate of Completion

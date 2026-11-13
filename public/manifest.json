@@ -1,6 +1,6 @@
 {
-  "name": "SkillSwap - A Smart Platform for Talent Sharing and Mutual Learning",
-  "short_name": "SkillSwap",
+  "name": "A Smart Platform for Talent Sharing and Mutual Learning",
+  "short_name": "TalentShare",
   "description": "A Smart Platform for Talent Sharing and Mutual Learning",
   "start_url": "/",
   "display": "standalone",

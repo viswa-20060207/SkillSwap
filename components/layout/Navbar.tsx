@@ -42,16 +42,16 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
     return (
       <header className="border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              S
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+              TS
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-slate-900 tracking-tight leading-tight">
-                Skill<span className="text-blue-600">Swap</span>
+              <span className="font-bold text-base text-slate-900 tracking-tight leading-tight">
+                Talent Sharing <span className="text-blue-600">&amp; Mutual Learning</span>
               </span>
-              <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium leading-none">
-                Talent Sharing &amp; Mutual Learning
+              <span className="text-[10px] text-slate-400 font-medium leading-none">
+                A Smart Platform
               </span>
             </div>
           </Link>
@@ -66,16 +66,16 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-8">
-          <Link href="/explore" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
-              S
+          <Link href="/explore" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
+              TS
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-lg text-slate-900 tracking-tight leading-tight">
-                Skill<span className="text-blue-600">Swap</span>
+              <span className="font-bold text-base text-slate-900 tracking-tight leading-tight">
+                Talent Sharing <span className="text-blue-600">&amp; Mutual Learning</span>
               </span>
-              <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium leading-none">
-                Talent Sharing &amp; Mutual Learning
+              <span className="text-[10px] text-slate-400 font-medium leading-none">
+                A Smart Platform
               </span>
             </div>
           </Link>

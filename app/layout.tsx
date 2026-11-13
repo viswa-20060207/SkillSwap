@@ -5,8 +5,8 @@ import { Navbar } from '@/components/layout/Navbar'
 import { ToastProvider } from '@/components/ui/Toast'
 
 export const metadata: Metadata = {
-  title: 'SkillSwap - A Smart Platform for Talent Sharing and Mutual Learning',
-  description: 'A Smart Platform for Talent Sharing and Mutual Learning. Trade skills, learn from peers, and collaborate in 1-on-1 real-time sessions.',
+  title: 'A Smart Platform for Talent Sharing and Mutual Learning',
+  description: 'A Smart Platform for Talent Sharing and Mutual Learning. Exchange talents, learn mutually, and collaborate in 1-on-1 real-time sessions.',
   manifest: '/manifest.json',
 }
 
