@@ -104,6 +104,9 @@ export default function RequestsPage() {
       setIncoming((prev) =>
         prev.map((r) => (r.id === requestId ? { ...r, status: newStatus } : r))
       )
+      setOutgoing((prev) =>
+        prev.map((r) => (r.id === requestId ? { ...r, status: newStatus } : r))
+      )
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to update request'
       toastError(msg)
@@ -290,6 +293,19 @@ export default function RequestsPage() {
                           <XCircle className="w-3.5 h-3.5 mr-1" /> Decline
                         </Button>
                       </div>
+                    )}
+
+                    {/* If Outgoing and Pending: allow Start Session (Instant Demo / Testing) */}
+                    {tab === 'outgoing' && req.status === 'pending' && (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleUpdateStatus(req.id, 'accepted')}
+                        isLoading={actionLoading === req.id}
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Start Session Now
+                      </Button>
                     )}
                   </div>
                 </div>
