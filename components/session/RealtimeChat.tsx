@@ -42,11 +42,11 @@ export function RealtimeChat({
 
   // Load last 50 messages and set up realtime subscription
   useEffect(() => {
+    let isMounted = true
     const supabase = createClient()
-    let channel: ReturnType<typeof supabase.channel>
 
-    async function initChat() {
-      // 1. Fetch initial 50 messages
+    // 1. Fetch initial 50 messages
+    async function fetchInitialMessages() {
       const { data, error } = await supabase
         .from('messages')
         .select(`
@@ -56,6 +56,8 @@ export function RealtimeChat({
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true })
         .limit(50)
+
+      if (!isMounted) return
 
       if (error) {
         console.error('Failed to load messages:', error)
@@ -82,64 +84,74 @@ export function RealtimeChat({
       }
       setLoading(false)
       scrollToBottom()
-
-      // 2. Set up realtime channel with postgres_changes and broadcast
-      channel = supabase
-        .channel(`session_chat:${sessionId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `session_id=eq.${sessionId}`,
-          },
-          async (payload) => {
-            const newMsg = payload.new as ChatMessage
-            // Fetch sender profile name
-            const { data: senderProfile } = await supabase
-              .from('profiles')
-              .select('name, avatar_url')
-              .eq('id', newMsg.sender_id)
-              .single()
-
-            setMessages((prev) => {
-              // Replace optimistic message if match exists, otherwise append
-              const filtered = prev.filter(
-                (m) => !(m.isOptimistic && m.sender_id === newMsg.sender_id && m.body === newMsg.body)
-              )
-              return [
-                ...filtered,
-                {
-                  ...newMsg,
-                  senderName: senderProfile?.name || 'Peer',
-                  senderAvatar: senderProfile?.avatar_url || '',
-                },
-              ]
-            })
-            scrollToBottom()
-          }
-        )
-        .on('broadcast', { event: 'chat_message' }, (payload) => {
-          const msg = payload.payload as ChatMessage
-          if (msg.sender_id !== currentUserId) {
-            setMessages((prev) => {
-              if (prev.some((m) => m.id === msg.id)) return prev
-              return [...prev, msg]
-            })
-            scrollToBottom()
-          }
-        })
-        .subscribe()
     }
 
-    initChat()
+    fetchInitialMessages()
 
-    // 3. Unsubscribe on unmount
+    // 2. Clean up any existing channel with this name to prevent duplicate subscription error
+    const existing = supabase.getChannels().find(
+      (c) => c.topic === `realtime:session_chat:${sessionId}`
+    )
+    if (existing) {
+      supabase.removeChannel(existing)
+    }
+
+    // 3. Set up realtime channel synchronously before subscribe
+    const channel = supabase
+      .channel(`session_chat:${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `session_id=eq.${sessionId}`,
+        },
+        async (payload) => {
+          if (!isMounted) return
+          const newMsg = payload.new as ChatMessage
+          // Fetch sender profile name
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('name, avatar_url')
+            .eq('id', newMsg.sender_id)
+            .single()
+
+          if (!isMounted) return
+          setMessages((prev) => {
+            // Replace optimistic message if match exists, otherwise append
+            const filtered = prev.filter(
+              (m) => !(m.isOptimistic && m.sender_id === newMsg.sender_id && m.body === newMsg.body)
+            )
+            return [
+              ...filtered,
+              {
+                ...newMsg,
+                senderName: senderProfile?.name || 'Peer',
+                senderAvatar: senderProfile?.avatar_url || '',
+              },
+            ]
+          })
+          scrollToBottom()
+        }
+      )
+      .on('broadcast', { event: 'chat_message' }, (payload) => {
+        if (!isMounted) return
+        const msg = payload.payload as ChatMessage
+        if (msg.sender_id !== currentUserId) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev
+            return [...prev, msg]
+          })
+          scrollToBottom()
+        }
+      })
+      .subscribe()
+
+    // 4. Unsubscribe on unmount
     return () => {
-      if (channel) {
-        supabase.removeChannel(channel)
-      }
+      isMounted = false
+      supabase.removeChannel(channel)
     }
   }, [sessionId, currentUserId])
 

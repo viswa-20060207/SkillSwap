@@ -89,6 +89,13 @@ export function CollaborativeWhiteboard({
     }
 
     const supabase = createClient()
+    const existing = supabase.getChannels().find(
+      (c) => c.topic === `realtime:whiteboard:${sessionId}`
+    )
+    if (existing) {
+      supabase.removeChannel(existing)
+    }
+
     const channel = supabase.channel(`whiteboard:${sessionId}`, {
       config: {
         broadcast: { self: false },

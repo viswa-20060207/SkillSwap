@@ -55,8 +55,8 @@ export function NotesPanel({ sessionId, currentUserId, currentUserName }: NotesP
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    let isMounted = true
     const supabase = createClient()
-    let channel: ReturnType<typeof supabase.channel>
 
     async function fetchNotes() {
       const { data, error } = await supabase
@@ -67,6 +67,8 @@ export function NotesPanel({ sessionId, currentUserId, currentUserName }: NotesP
         `)
         .eq('session_id', sessionId)
         .order('created_at', { ascending: false })
+
+      if (!isMounted) return
 
       if (error) {
         console.error('Failed to load notes:', error)
@@ -99,50 +101,62 @@ export function NotesPanel({ sessionId, currentUserId, currentUserName }: NotesP
         setNotes(loaded)
       }
       setLoading(false)
-
-      // Realtime subscription
-      channel = supabase
-        .channel(`session_notes:${sessionId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'notes',
-            filter: `session_id=eq.${sessionId}`,
-          },
-          async (payload) => {
-            if (payload.eventType === 'INSERT') {
-              const newRow = payload.new as NoteItem
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('name')
-                .eq('id', newRow.uploader_id)
-                .single()
-
-              setNotes((prev) => [
-                {
-                  ...newRow,
-                  uploaderName: profile?.name || 'Peer',
-                },
-                ...prev.filter((n) => n.id !== newRow.id),
-              ])
-            } else if (payload.eventType === 'DELETE') {
-              setNotes((prev) => prev.filter((n) => n.id !== payload.old.id))
-            }
-          }
-        )
-        .on('broadcast', { event: 'new_note' }, (payload) => {
-          const note = payload.payload as NoteItem
-          setNotes((prev) => [note, ...prev.filter((n) => n.id !== note.id)])
-        })
-        .subscribe()
     }
 
     fetchNotes()
 
+    // Clean up any existing channel with this name to prevent duplicate subscription error
+    const existing = supabase.getChannels().find(
+      (c) => c.topic === `realtime:session_notes:${sessionId}`
+    )
+    if (existing) {
+      supabase.removeChannel(existing)
+    }
+
+    // Realtime subscription set up synchronously before subscribe
+    const channel = supabase
+      .channel(`session_notes:${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notes',
+          filter: `session_id=eq.${sessionId}`,
+        },
+        async (payload) => {
+          if (!isMounted) return
+          if (payload.eventType === 'INSERT') {
+            const newRow = payload.new as NoteItem
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('name')
+              .eq('id', newRow.uploader_id)
+              .single()
+
+            if (!isMounted) return
+            setNotes((prev) => [
+              {
+                ...newRow,
+                uploaderName: profile?.name || 'Peer',
+              },
+              ...prev.filter((n) => n.id !== newRow.id),
+            ])
+          } else if (payload.eventType === 'DELETE') {
+            setNotes((prev) => prev.filter((n) => n.id !== payload.old.id))
+          }
+        }
+      )
+      .on('broadcast', { event: 'new_note' }, (payload) => {
+        if (!isMounted) return
+        const note = payload.payload as NoteItem
+        setNotes((prev) => [note, ...prev.filter((n) => n.id !== note.id)])
+      })
+      .subscribe()
+
     return () => {
-      if (channel) supabase.removeChannel(channel)
+      isMounted = false
+      supabase.removeChannel(channel)
     }
   }, [sessionId])
 
