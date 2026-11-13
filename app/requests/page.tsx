@@ -33,6 +33,31 @@ interface SessionRequestItem {
   toProfile?: { id: string; name: string; avatar_url: string; college: string } | null
 }
 
+function getGoogleCalendarLink(title: string, message: string) {
+  const match = message.match(/\[📅 Proposed: (.*?) at (.*?) \((\d+) mins\)\]/)
+  let startTime = new Date(Date.now() + 24 * 3600 * 1000)
+  let duration = 45
+
+  if (match) {
+    try {
+      const parsed = new Date(`${match[1]} ${match[2]}`)
+      if (!isNaN(parsed.getTime())) startTime = parsed
+      duration = parseInt(match[3], 10) || 45
+    } catch {}
+  }
+
+  const endTime = new Date(startTime.getTime() + duration * 60 * 1000)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const toUtc = (d: Date) =>
+    `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+    `SkillSwap: ${title}`
+  )}&dates=${toUtc(startTime)}/${toUtc(endTime)}&details=${encodeURIComponent(
+    `1-on-1 Peer Session on SkillSwap.\n${message}`
+  )}`
+}
+
 export default function RequestsPage() {
   const [tab, setTab] = useState<'incoming' | 'outgoing'>('incoming')
   const [incoming, setIncoming] = useState<SessionRequestItem[]>([])
@@ -253,7 +278,17 @@ export default function RequestsPage() {
                         </p>
                       )}
 
-                      <p className="text-[11px] text-slate-400">{formattedDate}</p>
+                      <div className="flex flex-wrap items-center gap-3 pt-0.5">
+                        <p className="text-[11px] text-slate-400">{formattedDate}</p>
+                        <a
+                          href={getGoogleCalendarLink(req.skills?.name || 'Peer Learning', req.message || '')}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-800 bg-blue-50/80 hover:bg-blue-100/80 px-2 py-0.5 rounded-md border border-blue-200/60 transition-colors"
+                        >
+                          <Calendar className="w-3 h-3 text-blue-600" /> Google Calendar
+                        </a>
+                      </div>
                     </div>
                   </div>
 

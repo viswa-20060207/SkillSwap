@@ -264,6 +264,41 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </div>
       </div>
 
+      {/* Real-World Learning & Mentorship Analytics Dashboard */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Swapped</p>
+          <p className="text-xl font-extrabold text-blue-600 mt-0.5">
+            {((completedSessionsCount || 1) * 45 / 60).toFixed(1)} hrs
+          </p>
+          <span className="text-[10px] text-slate-500">Peer collaboration time</span>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Sessions Finished</p>
+          <p className="text-xl font-extrabold text-emerald-600 mt-0.5">
+            {completedSessionsCount || certificates.length}
+          </p>
+          <span className="text-[10px] text-slate-500">1-on-1 exchanges</span>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Verified Skills</p>
+          <p className="text-xl font-extrabold text-indigo-600 mt-0.5">
+            {teachSkills.filter((s) => s.is_verified).length}
+          </p>
+          <span className="text-[10px] text-slate-500">Quiz benchmarked</span>
+        </div>
+
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Karma Score</p>
+          <p className="text-xl font-extrabold text-amber-600 mt-0.5">
+            {Math.max(30, (completedSessionsCount || certificates.length) * 25 + teachSkills.filter((s) => s.is_verified).length * 30 + 20)} pts
+          </p>
+          <span className="text-[10px] text-slate-500">Community reputation</span>
+        </div>
+      </div>
+
       {/* Skills Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Skills I Can Teach */}
