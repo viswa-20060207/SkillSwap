@@ -317,7 +317,7 @@ export default function ExplorePage() {
       <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
         <div className="max-w-2xl">
           <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider">
-            Peer Discovery
+            A Smart Platform for Talent Sharing &amp; Mutual Learning
           </span>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-3 tracking-tight">
             Find Mentors & Skill Partners

@@ -1,7 +1,7 @@
 {
-  "name": "SkillSwap",
+  "name": "SkillSwap - A Smart Platform for Talent Sharing and Mutual Learning",
   "short_name": "SkillSwap",
-  "description": "Peer-to-peer 1-on-1 skill exchange and learning platform",
+  "description": "A Smart Platform for Talent Sharing and Mutual Learning",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

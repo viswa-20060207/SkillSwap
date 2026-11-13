@@ -45,9 +45,14 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
               S
             </div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">
-              Skill<span className="text-blue-600">Swap</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-slate-900 tracking-tight leading-tight">
+                Skill<span className="text-blue-600">Swap</span>
+              </span>
+              <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium leading-none">
+                Talent Sharing &amp; Mutual Learning
+              </span>
+            </div>
           </Link>
           <ThemeToggle />
         </div>
@@ -64,9 +69,14 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
               S
             </div>
-            <span className="font-bold text-xl text-slate-900 tracking-tight">
-              Skill<span className="text-blue-600">Swap</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-slate-900 tracking-tight leading-tight">
+                Skill<span className="text-blue-600">Swap</span>
+              </span>
+              <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium leading-none">
+                Talent Sharing &amp; Mutual Learning
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
