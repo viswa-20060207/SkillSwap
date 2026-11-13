@@ -17,6 +17,7 @@ import {
   Calendar,
   ArrowRight,
   Sparkles,
+  Award,
 } from 'lucide-react'
 
 interface SessionRequestItem {
@@ -258,17 +259,28 @@ export default function RequestsPage() {
 
                   {/* Actions */}
                   <div className="flex flex-wrap sm:flex-col items-end gap-2.5 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
-                    {/* If Accepted, show Open Session button */}
+                    {/* If Accepted, show Open Session and Certificate button */}
                     {req.status === 'accepted' && (
-                      <Link href={`/sessions/${req.id}`} className="w-full sm:w-auto">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Open Session <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                        </Button>
-                      </Link>
+                      <div className="flex flex-wrap sm:flex-col items-end gap-2 w-full sm:w-auto">
+                        <Link href={`/sessions/${req.id}`} className="w-full sm:w-auto">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Open Session <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                          </Button>
+                        </Link>
+                        <Link href={`/certificates/${req.id}`} className="w-full sm:w-auto">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full sm:w-auto text-xs border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 font-semibold"
+                          >
+                            <Award className="w-3.5 h-3.5 mr-1.5 text-amber-600" /> Certificate 📜
+                          </Button>
+                        </Link>
+                      </div>
                     )}
 
                     {/* If Incoming and Pending, show Accept / Decline */}

@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
-import { X, Send, Calendar, CheckCircle2, AlertCircle } from 'lucide-react'
+import { X, Send, Calendar, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
 
 interface SkillOption {
   id: string
@@ -28,6 +28,8 @@ export function RequestSessionModal({
 }: RequestSessionModalProps) {
   const [selectedSkillId, setSelectedSkillId] = useState<string>(skills[0]?.id || '')
   const [message, setMessage] = useState('')
+  const [proposedDate, setProposedDate] = useState('')
+  const [durationMins, setDurationMins] = useState<number>(45)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -64,11 +66,17 @@ export function RequestSessionModal({
         return
       }
 
+      const schedulePrefix = proposedDate
+        ? `[📅 Proposed: ${new Date(proposedDate).toLocaleDateString()} at ${new Date(proposedDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${durationMins} mins)]\n\n`
+        : ''
+
+      const finalMessage = `${schedulePrefix}${message.trim()}`
+
       const { error: insertError } = await supabase.from('session_requests').insert({
         from_id: user.id,
         to_id: targetUserId,
         skill_id: selectedSkillId || null,
-        message: message.trim(),
+        message: finalMessage,
         status: 'pending',
       })
 
@@ -78,6 +86,7 @@ export function RequestSessionModal({
       setTimeout(() => {
         setSuccess(false)
         setMessage('')
+        setProposedDate('')
         onClose()
       }, 1500)
     } catch (err: unknown) {
@@ -148,6 +157,43 @@ export function RequestSessionModal({
                   ))}
                 </select>
               )}
+            </div>
+
+            {/* Smart Schedule: Date & Time Picker */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-blue-600" /> Proposed Date &amp; Time
+                </label>
+                <input
+                  type="datetime-local"
+                  value={proposedDate}
+                  onChange={(e) => setProposedDate(e.target.value)}
+                  className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" /> Duration
+                </label>
+                <div className="flex items-center gap-1">
+                  {[30, 45, 60].map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setDurationMins(mins)}
+                      className={`flex-1 py-1 px-2 rounded-lg text-xs font-semibold border transition-all ${
+                        durationMins === mins
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {mins}m
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div>

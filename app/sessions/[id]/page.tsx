@@ -11,6 +11,7 @@ import { CompleteSessionAction } from '@/components/session/CompleteSessionModal
 import {
   ArrowLeft,
   ShieldCheck,
+  Award,
 } from 'lucide-react'
 
 interface SessionRoomPageProps {
@@ -123,8 +124,18 @@ export default async function SessionRoomPage({ params }: SessionRoomPageProps) 
           </div>
         </div>
 
-        {/* Action Controls: Complete & Rate + Voice Call (P8/P9+) */}
+        {/* Action Controls: Complete & Rate + Certificate + Voice Call (P8/P9+) */}
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-end">
+          <Link href={`/certificates/${sessionId}`} target="_blank">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 font-semibold"
+            >
+              <Award className="w-3.5 h-3.5 mr-1.5 text-amber-600" /> Certificate 📜
+            </Button>
+          </Link>
+
           {otherUser?.id && (
             <CompleteSessionAction
               sessionId={sessionId}

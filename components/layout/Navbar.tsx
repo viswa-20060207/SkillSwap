@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { Compass, Users, User, LogOut, Menu, X, Inbox } from 'lucide-react'
+import { Compass, Users, User, LogOut, Menu, X, Inbox, Trophy } from 'lucide-react'
 
 interface NavbarProps {
   currentUserId?: string
@@ -32,6 +32,7 @@ export function Navbar({ currentUserId, userName = 'Member', userAvatar }: Navba
   const navLinks = [
     { href: '/explore', label: 'Explore Skills', icon: Compass },
     { href: '/requests', label: 'Requests', icon: Inbox },
+    { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
     { href: '/following', label: 'Following', icon: Users },
     ...(currentUserId ? [{ href: `/profile/${currentUserId}`, label: 'My Profile', icon: User }] : []),
   ]

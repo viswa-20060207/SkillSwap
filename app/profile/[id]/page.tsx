@@ -113,6 +113,28 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     // Graceful fallback before 002_enhancements.sql
   }
 
+  // 2c. Fetch completed sessions for certificates showcase
+  let certificates: Array<{ id: string; skillName: string; completedAt: string }> = []
+  try {
+    const { data: certData } = await supabase
+      .from('session_requests')
+      .select('id, created_at, completed_at, skills(name)')
+      .or(`from_id.eq.${profileId},to_id.eq.${profileId}`)
+      .eq('status', 'accepted')
+      .order('created_at', { ascending: false })
+      .limit(6)
+
+    if (certData) {
+      certificates = certData.map((c) => ({
+        id: c.id,
+        skillName: (c.skills as unknown as { name: string })?.name || 'SkillSwap Session',
+        completedAt: c.completed_at || c.created_at,
+      }))
+    }
+  } catch {
+    // Graceful fallback
+  }
+
   const averageRating =
     reviews.length > 0
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
@@ -389,6 +411,62 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {rev.comment && (
                   <p className="text-xs text-slate-600 leading-relaxed">{rev.comment}</p>
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Earned Certificates Showcase */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Award className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="font-bold text-slate-900 text-base">Verified Credentials &amp; Certificates</h2>
+              <p className="text-xs text-slate-500">Official proof of 1-on-1 peer exchange sessions</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">
+            {certificates.length} Issued
+          </span>
+        </div>
+
+        {certificates.length === 0 ? (
+          <p className="text-sm text-slate-400 italic py-3">
+            No completed sessions yet. Accept and complete a session to earn your official certificate!
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {certificates.map((cert) => (
+              <div
+                key={cert.id}
+                className="p-4 bg-gradient-to-br from-amber-50/40 via-white to-slate-50 border border-amber-200/80 rounded-xl space-y-3 relative overflow-hidden group hover:border-amber-400 transition-all shadow-xs"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono text-amber-700 font-bold uppercase tracking-wider block">
+                      ID: SWAP-{cert.id.substring(0, 6).toUpperCase()}
+                    </span>
+                    <h4 className="font-bold text-slate-900 text-sm mt-0.5">{cert.skillName}</h4>
+                  </div>
+                  <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs">
+                    📜
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-slate-500 flex items-center justify-between pt-1 border-t border-slate-100">
+                  <span>{new Date(cert.completedAt).toLocaleDateString()}</span>
+                  <Link
+                    href={`/certificates/${cert.id}`}
+                    target="_blank"
+                    className="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  >
+                    View Credential →
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
